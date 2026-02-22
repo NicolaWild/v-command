@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLiNG Trainer Voice Controller & Manager</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-hover: #45a049;
+            --bg-color: #0f172a;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --card-bg: #1e293b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+
+        .zh { display: none; }
+        body.lang-zh .zh { display: block; }
+        body.lang-zh .en { display: none; }
+
+        body.lang-zh span.zh { display: inline; }
+        body.lang-zh span.en { display: none; }
+
+        header {
+            padding: 20px 10%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links a, .lang-switch {
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .lang-switch {
+            padding: 5px 10px;
+            border: 1px solid #334155;
+            border-radius: 5px;
+            background: var(--card-bg);
+            transition: 0.3s;
+        }
+
+        .lang-switch:hover {
+            border-color: var(--primary-color);
+        }
+
+        .hero {
+            text-align: center;
+            padding: 80px 20px;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+        }
+
+        .hero h1 { font-size: 3rem; margin-bottom: 20px; }
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 30px auto;
+        }
+
+        /* 核心下载按钮 */
+        .btn-download {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: background 0.3s;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-download:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        /* 优化后的：低调版试用激活码展示框 */
+        .trial-box {
+            margin: 10px auto 20px auto;
+            padding: 8px 16px;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid #334155;
+            border-radius: 6px;
+            display: inline-block; /* 收缩到内容宽度 */
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .trial-code {
+            display: inline-block;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--primary-color); /* 改为绿字暗底 */
+            background: #0f172a;
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px dashed #334155;
+            letter-spacing: 1px;
+            margin-left: 8px;
+            user-select: all;
+            cursor: copy;
+            transition: border-color 0.2s;
+        }
+
+        .trial-code:hover {
+            border-color: var(--primary-color);
+        }
+
+        .version-info {
+            display: block;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .features {
+            padding: 80px 10%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            text-align: center;
+        }
+
+        .feature-card {
+            background-color: var(--card-bg);
+            padding: 40px 20px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+        }
+
+        .feature-icon { font-size: 3rem; margin-bottom: 20px; }
+        .feature-card h3 { font-size: 1.3rem; margin-bottom: 15px; }
+        .feature-card p { color: var(--text-muted); font-size: 0.95rem; }
+
+        footer {
+            background-color: #0b1121;
+            padding: 40px 10%;
+            text-align: center;
+            border-top: 1px solid #334155;
+            color: var(--text-muted);
+        }
+
+        footer p { margin-bottom: 10px; }
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 0.9rem;
+        }
+        .footer-links a:hover { color: var(--primary-color); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <span class="en">🎮 FLiNG Voice Manager</span>
+            <span class="zh">🎮 风灵月影语令助手</span>
+        </div>
+        <div class="nav-links">
+            <a href="mailto:gbrain@yeah.net" class="en">Contact Us</a>
+            <a href="mailto:gbrain@yeah.net" class="zh">联系我们</a>
+            <button class="lang-switch" onclick="toggleLanguage()">🌐 EN / 中文</button>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1 class="en">FLiNG Trainer Voice Controller & Manager</h1>
+        <h1 class="zh">风灵月影 语音控制器 + 管理器</h1>
+
+        <p class="en">Control your FLiNG trainers seamlessly with your voice. Keep your hands on the controller, manage all your cheat configs in one place, and trigger commands instantly without breaking immersion.</p>
+        <p class="zh">用声音直接掌控风灵月影！无需切屏，让双手专注在手柄上。一站式管理所有修改器配置，享受沉浸式、零延迟的语音指令触发体验。</p>
+
+        <div>
+            <a href="#" class="btn-download">
+                <span class="en">⬇️ Download for Windows</span>
+                <span class="zh">⬇️ 免费下载 (Windows)</span>
+            </a>
+        </div>
+
+        <div class="trial-box">
+            <span class="en">🎁 3-Day Free Trial Code: <span class="trial-code" title="Click to copy">FREEDAY3</span></span>
+            <span class="zh">🎁 软件内输入激活码畅享 3 天免费试用: <span class="trial-code" title="点击即可复制">FREEDAY3</span></span>
+        </div>
+
+        <div class="version-info">
+            <span class="en">Current Version: V1.0.0 | Size: ~227MB | Standalone Archive</span>
+            <span class="zh">当前版本: V1.0.0 | 软件大小: ~227MB | 绿色压缩包</span>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="feature-card">
+            <div class="feature-icon">🎙️</div>
+            <h3 class="en">Offline AI Voice Engine</h3>
+            <h3 class="zh">本地 AI 离线识别</h3>
+            <p class="en">Powered by a built-in offline speech recognition model. Extremely low latency, highly accurate, and 100% privacy-focused. No internet required for voice processing.</p>
+            <p class="zh">内置高性能离线语音识别引擎。无需联网，超低延迟，保护您的隐私，让指令触发像按键一样快。</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">⚙️</div>
+            <h3 class="en">Smart FLiNG Manager</h3>
+            <h3 class="zh">智能修改器管理</h3>
+            <p class="en">Automatically sync and manage all your FLiNG Trainer configurations. Map complex keyboard shortcuts to simple, intuitive voice commands in seconds.</p>
+            <p class="zh">集中管理所有风灵月影修改器，自动拉取配置。秒级将复杂的键盘快捷键映射为最符合直觉的语音指令。</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🎮</div>
+            <h3 class="en">Seamless Integration</h3>
+            <h3 class="zh">无缝游戏融合</h3>
+            <p class="en">Designed for controller players. Trigger "God Mode" or "Infinite Health" by simply speaking. Stay immersed in your AAA games without reaching for the keyboard.</p>
+            <p class="zh">专为手柄玩家打造。只需喊出“开启无敌”或“加血”，即可触发功能。让你彻底告别键盘，享受极致的 3A 游戏沉浸感。</p>
+        </div>
+    </section>
+
+    <footer>
+        <p class="en">© 2025 FLiNG Voice Manager. All rights reserved.</p>
+        <p class="zh">© 2025 风灵月影语令助手 保留所有权利。</p>
+
+        <p class="en">Contact Us: <a href="mailto:gbrain@yeah.net" style="color: var(--primary-color);">gbrain@yeah.net</a></p>
+        <p class="zh">联系邮箱: <a href="mailto:gbrain@yeah.net" style="color: var(--primary-color);">gbrain@yeah.net</a></p>
+
+        <div class="footer-links">
+            <a href="#" class="en">Terms of Service</a>
+            <a href="#" class="zh">服务条款</a>
+            <a href="#" class="en">Privacy Policy</a>
+            <a href="#" class="zh">隐私政策</a>
+            <a href="#" class="en">Refund Policy</a>
+            <a href="#" class="zh">退款政策</a>
+        </div>
+    </footer>
+
+    <script>
+        function toggleLanguage() {
+            document.body.classList.toggle('lang-zh');
+            if (document.body.classList.contains('lang-zh')) {
+                document.title = "风灵月影语音控制器 + 管理器";
+            } else {
+                document.title = "FLiNG Trainer Voice Controller & Manager";
+            }
+        }
+    </script>
+</body>
+</html>
